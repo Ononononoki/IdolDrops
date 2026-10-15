@@ -1,6 +1,6 @@
 {
   "name": "IdolDrops",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/Ononononoki/IdolDrops",
   "description": "Enemies drop Forge of Potential idols of their own biome. Tougher enemies drop more often, bosses always drop one. Works with creature mods. Server synced.",
   "dependencies": [

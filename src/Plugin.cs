@@ -16,7 +16,7 @@ namespace IdolDrops
     {
         public const string ModGuid = "onononoki.IdolDrops";
         public const string ModName = "IdolDrops";
-        public const string ModVersion = "1.0.0";
+        public const string ModVersion = "1.0.1";
 
         internal static ManualLogSource Log;
         internal static ConfigEntry<bool> Enabled;
@@ -54,7 +54,7 @@ namespace IdolDrops
             WeaponShare = Config.Bind("1 - General", "WeaponShare", 50f,
                 new ConfigDescription("Percent of drops that are Battle idols. The rest are Protection idols.", new AcceptableValueRange<float>(0f, 100f), sync));
             RequirePlayerKill = Config.Bind("1 - General", "RequirePlayerKill", true,
-                new ConfigDescription("Only creatures whose last hit came from a player drop idols. Stops farms and fights between creatures from making idols. Bosses always drop.", null, sync));
+                new ConfigDescription("Only creatures killed by a player drop idols. A kill finished by burning, poison or other damage over time counts when a player hit the creature. Stops farms and fights between creatures from making idols. Bosses always drop.", null, sync));
             SummonsDrop = Config.Bind("1 - General", "SummonsDrop", false,
                 new ConfigDescription("Creatures spawned by other creatures and bosses (Bonemass's skeletons, Gjall's ticks, the Queen's brood, an Oozer's blobs) can drop idols too.", null, sync));
             MaxStars = Config.Bind("1 - General", "MaxStars", 2,

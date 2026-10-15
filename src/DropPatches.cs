@@ -28,7 +28,7 @@ namespace IdolDrops
             string auto = null;
             if (!Plugin.Rules.TryGetValue(name, out var rule) && !AutoRules.TryGet(character, name, out rule, out auto)) return;
 
-            string skip = SkipReason(character, rule.Boss);
+            string skip = SkipReason(character, rule.Boss, out string note);
             if (skip == null && __result.Any(d => d.Key && d.Key.name.StartsWith("Upgrader"))) skip = "it already drops an idol";
             if (skip != null)
             {
@@ -49,22 +49,33 @@ namespace IdolDrops
             float chance = DropRules.Chance(rule.Percent, stars, Plugin.ChancePerStar.Value, fromEvent,
                 Plugin.EventMultiplier.Value, Plugin.GlobalMultiplier.Value);
             float roll = Random.value;
-            string detail = $"{stars} star, tier {rule.Tier}, chance {chance * 100f:0.###}%{(fromEvent ? " (event)" : "")}, roll {roll * 100f:0.###}{origin}";
+            string detail = $"{stars} star, tier {rule.Tier}, chance {chance * 100f:0.###}%{(fromEvent ? " (event)" : "")}, roll {roll * 100f:0.###}{origin}{(note == null ? "" : ", " + note)}";
             if (roll < chance)
                 Add(__result, name, rule.Tier, weapon, detail);
             else if (Plugin.LogDrops.Value)
                 Plugin.Log.LogInfo($"{name}: no idol, {detail}");
         }
 
-        // why this creature gives no idol, or null when it may
-        private static string SkipReason(Character character, bool boss)
+        // why this creature gives no idol, or null when it may. note tells when a last hit without attacker counted
+        private static string SkipReason(Character character, bool boss, out string note)
         {
+            note = null;
             if (character.IsTamed()) return "tamed";
             if (character.m_faction == Character.Faction.PlayerSpawned) return "player summon";
             if (!Plugin.SummonsDrop.Value && SummonMark.IsMarked(character)) return "spawned by another creature";
             if (boss || !Plugin.RequirePlayerKill.Value) return null;
-            var attacker = LastHitOf(character)?.GetAttacker();
-            return attacker && attacker.IsPlayer() ? null : "last hit not from a player";
+            var hit = LastHitOf(character);
+            bool hasAttacker = hit != null && hit.HaveAttacker();
+            var attacker = hasAttacker ? hit.GetAttacker() : null;
+            return DropRules.PlayerKillSkip(hasAttacker, attacker && attacker.IsPlayer(), hasAttacker ? 0 : PlayersWhoHit(character), out note);
+        }
+
+        // how many players damaged the creature, counted by the game itself in Character.RPC_Damage
+        private static int PlayersWhoHit(Character character)
+        {
+            var view = character.GetComponent<ZNetView>();
+            var zdo = view ? view.GetZDO() : null;
+            return zdo == null ? 0 : zdo.GetInt(ZDOVars.s_attackers, 0);
         }
 
         // raid creatures, and anything killed inside an active world event such as the Jotun invasion

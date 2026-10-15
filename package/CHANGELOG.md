@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Fixed missing idols when burning, poison or spirit damage made the kill. Such kills now count when a player hit the enemy.
+
 ## 1.0.0
 
 - First release.

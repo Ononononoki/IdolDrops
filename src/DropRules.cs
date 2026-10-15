@@ -130,6 +130,18 @@ namespace IdolDrops
         // the game's idol prefabs: Upgrader0Weapon (Battle idol) to Upgrader7Armor (Protection idol)
         internal static string IdolName(int tier, bool weapon) => $"Upgrader{tier}{(weapon ? "Weapon" : "Armor")}";
 
+        // why a kill does not count as a player kill, or null when it does. the game's damage over time (burning,
+        // poison, spirit, smoke) hits with no attacker, so a last hit without one counts when a player damaged the
+        // creature, and note says so
+        internal static string PlayerKillSkip(bool lastHitHasAttacker, bool lastHitByPlayer, int playersWhoHit, out string note)
+        {
+            note = null;
+            if (lastHitHasAttacker) return lastHitByPlayer ? null : "last hit not from a player";
+            if (playersWhoHit <= 0) return "last hit had no attacker and no player hit it";
+            note = "last hit without attacker (damage over time), a player hit it";
+            return null;
+        }
+
         // never auto-added: vanilla animals, summons, boss adds, test objects and creatures of unclear origin
         internal const string DefaultExcluded =
             "Deer, Deer_White, Chicken, Hen, Boar_piggy, Wolf_cub, Lox_Calf, Moose, Moose_calf, Seal, Seal_Pup, Hare, " +
